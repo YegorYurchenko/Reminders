@@ -1,0 +1,87 @@
+.header {
+    &__inner {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        height: 80px;
+        width: 100%;
+        padding: 20px 25px;
+        border-radius: 6px 6px 0 0;
+        background-color: color('blue');
+
+        @media (max-width: grid('xs')) {
+           height: 60px;
+        }
+    }
+
+    &__list {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+    }
+
+    &__logo-text {
+        color: color('white');
+        font-size: 28px;
+        letter-spacing: 1.5px;
+
+        @media (max-width: grid('xs')) {
+           font-size: 18px;
+        }
+    }
+
+    &__btn {
+        position: relative;
+        height: 50px;
+        width: 50px;
+        background-color: color('grey');
+        border-radius: 50%;
+        box-shadow: 0 5px 10px -4px rgba(0, 0, 0, .5);
+        cursor: pointer;
+        transition: background-color 0.25s ease-in-out;
+
+        @media (max-width: grid('xs')) {
+            height: 40px;
+            width: 40px;
+        }
+
+        &:before {
+            content: "";
+            position: absolute;
+            left: calc(50% - 13px); 
+            top: calc(50% - 2px);
+            height: 4px; 
+            width: 26px;
+            background-color: color('white');
+
+            @media (max-width: grid('xs')) {
+                left: calc(50% - 9px); 
+                top: calc(50% - 1px);
+                height: 2px; 
+                width: 18px;
+            }
+        }
+
+        &:after {
+            content: "";
+            position: absolute;
+            left: calc(50% - 2px); 
+            top: calc(50% - 13px);
+            width: 4px; 
+            height: 26px;
+            background-color: color('white');
+
+            @media (max-width: grid('xs')) {
+                left: calc(50% - 1px); 
+                top: calc(50% - 9px);
+                width: 2px; 
+                height: 18px;
+            }
+        }
+
+        &:hover {
+            background-color: color('grey2');
+        }
+    }
+}

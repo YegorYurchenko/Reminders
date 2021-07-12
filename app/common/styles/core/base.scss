@@ -25,7 +25,26 @@ body {
 .page {
     position: relative;
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
     height: 100vh;
+    background-color: color('grey-lightest');
+
+    &__content {
+        width: 600px;
+        height: 85%;
+
+        @media (max-width: grid('md')) {
+            width: 400px;
+        }
+
+        @media (max-width: grid('xs')) {
+            width: 100%;
+            height: 100%;
+        }
+    }
 }
 
 .main {
@@ -41,4 +60,8 @@ button {
 
 a {
     text-decoration: none;
+}
+
+li {
+    list-style: none;
 }
