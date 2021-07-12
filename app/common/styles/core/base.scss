@@ -1,0 +1,44 @@
+* {
+    box-sizing: inherit;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    position: relative;
+    font-size: var(--font-size-base);
+    box-sizing: border-box;
+    font-family: sans-serif;
+    -webkit-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
+    -ms-overflow-style: scrollbar;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+
+body {
+    position: relative;
+    display: block;
+    margin: 0;
+    background-color: color('gray-lighter');
+}
+
+.page {
+    position: relative;
+    overflow: hidden;
+    height: 100vh;
+}
+
+.main {
+    position: relative;
+}
+
+button {
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+    outline: none;
+}
+
+a {
+    text-decoration: none;
+}
