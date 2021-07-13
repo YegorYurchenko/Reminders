@@ -21,3 +21,44 @@
         flex-grow: 1;
     }
 }
+
+.scrollable {
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+
+/*Edge*/
+@supports (-ms-ime-align:auto)  {
+    .scrollable:after {
+        content: '';
+        height: 16px;
+        display: block;
+    }
+}
+
+/*Firefox*/
+.scrollable {
+    scrollbar-width: thin;
+    scrollbar-color: color('blue') color('white');
+}
+
+
+/*Chrome*/
+.scrollable::-webkit-scrollbar-track {
+    margin: 5px 0;
+    width: 4px;
+    background-color: color('white');
+    border-radius: 3px;
+}
+
+.scrollable::-webkit-scrollbar-thumb {
+    background-color: color('blue');
+    border-radius: 3px;
+    background-clip: content-box;
+}
+
+.scrollable::-webkit-scrollbar {
+    width: 6.5px;
+}
