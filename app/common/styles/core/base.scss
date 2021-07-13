@@ -49,6 +49,12 @@ body {
 
 .main {
     position: relative;
+    width: 100%;
+    height: calc(100% - 80px);
+
+    @media (max-width: grid('xs')) {
+        height: calc(100% - 60px);
+    }
 }
 
 button {

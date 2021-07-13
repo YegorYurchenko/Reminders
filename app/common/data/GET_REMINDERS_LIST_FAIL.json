@@ -1,0 +1,7 @@
+{
+    "success": true,
+    "status": "GET_REMINDERS_LIST_FAIL",
+    "data": {
+        "errorMessage": "Ошибка"
+    }
+}

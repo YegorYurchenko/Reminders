@@ -47,9 +47,10 @@
 
 /*Chrome*/
 .scrollable::-webkit-scrollbar-track {
+    margin: 5px 0;
+    width: 4px;
     background-color: color('white');
     border-radius: 3px;
-    width: 4px;
 }
 
 .scrollable::-webkit-scrollbar-thumb {

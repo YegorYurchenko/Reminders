@@ -8,5 +8,12 @@
 <div class="page">
     <div class="page__content">
         <%= _.template(require('html-loader?&interpolate!../../components/header/header.html'))() %>
+        <main class="main">
+            <%= _.template(require('html-loader?&interpolate!../../components/reminders/reminders.html'))() %>
+        </main>
     </div>
 </div>
+
+<%= require('html-loader!../../components/templates/reminders-item.html') %>
+
+<%= _.template(require('html-loader?&interpolate!../../layouts/footer.html'))() %>
