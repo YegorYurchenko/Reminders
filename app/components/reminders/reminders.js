@@ -38,7 +38,7 @@ class Reminders {
                 switch (receivedData.status) {
                     case "GET_REMINDERS_LIST_SUCCESS":
                         setTimeout(() => {
-                            this.remindersInner.innerHTML = this.getEmojiData(receivedData.data);
+                            this.remindersInner.innerHTML = this.getReminderData(receivedData.data);
                         }, 800);
                         break;
                     case "GET_REMINDERS_LIST_FAIL":
@@ -65,9 +65,9 @@ class Reminders {
      * @param {Object} data - данные из AJAX-запроса
      * @returns {string}
      */
-    getEmojiData(data) {
-        const emojiListTemplate = document.getElementById("reminders-item");
-        const tmpl = template(emojiListTemplate.innerHTML);
+    getReminderData(data) {
+        const reminderItemsTemplate = document.getElementById("reminders-item-template");
+        const tmpl = template(reminderItemsTemplate.innerHTML);
         let reminderItems = "";
 
         if (data.length !== 0) {
@@ -87,10 +87,21 @@ class Reminders {
         return reminderItems;
     }
 
+    /**
+     * Получаем дату в нужной форме
+     * @param {Object} date - объект с годом, месяцем и днём
+     * @returns {string}
+     */
     getReceivedDate(date) {
         return `${this.date[date.month]} ${date.day}, ${date.year}`;
     }
 
+    /**
+     * Получаем время в нужной форме
+     * @param {Object} time - объект с часом и минутой
+     * @param {string} timeZone - AM или PM
+     * @returns {string}
+     */
     static getReceivedTime(time, timeZone) {
         return `${time.hours}:${time.minutes} ${timeZone}`;
     }

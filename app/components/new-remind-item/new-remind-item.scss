@@ -1,0 +1,65 @@
+.new-remind-item {
+    z-index: 10;
+    position: fixed;
+    top: 0;
+    left: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100vw;
+    background-color: rgba(0, 0, 0, 0);
+    transition: background-color 0.2s ease-in;
+
+    &.is-visible {
+        visibility: visible;
+        background-color: rgba(0, 0, 0, .65);
+    }
+
+    &.is-active {
+        left: 0;
+    }
+
+    &__form {
+        position: relative;
+        padding: 50px 25px 25px;
+        width: 400px;
+        background-color: color('white');
+        border-radius: 10px;
+
+        @media (max-width: grid('xs')) {
+           width: 300px;
+        }
+    }
+
+    &__close-btn {
+        display: block;
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        padding: 5px;
+    }
+
+    &__close-svg {
+        width: 20px;
+        height: 20px;
+        fill: color('grey');
+    }
+
+    &__title {
+        margin: 0 0 30px;
+        padding: 5px 5px 10px;
+        width: 100%;
+        font-size: 22px;
+        border-bottom: 1px solid color('grey');
+
+        &::placeholder {
+            color: color('grey');
+        }
+
+        @media (max-width: grid('xs')) {
+           font-size: 16px;
+        }
+    }
+}
