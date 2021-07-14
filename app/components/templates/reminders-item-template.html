@@ -5,11 +5,11 @@
                 <div class="reminders__item-title"><%= title %></div>
     <% } %>
                 <div class="reminders__item-main-wrapper">
-                    <div class="reminders__item-main">
+                    <div class="reminders__item-main <% if (!title) { %>js-new-item-block<% } %>">
                         <% if (title) { %> 
                             <div class="reminders__item-date">
                         <% } else { %>
-                            <button class="reminders__item-date reminders__button" type="button">
+                            <button class="reminders__item-date reminders__button js-new-item-date-btn" type="button">
                         <% } %>
                             <svg class="reminders__calendar-svg reminders__svg" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
                                 width="36.447px" height="36.447px" viewBox="0 0 36.447 36.447" style="enable-background:new 0 0 36.447 36.447;"
@@ -25,7 +25,7 @@
                                         <rect x="6.724" y="14.626" width="4.595" height="4.089"/>
                                 </g></g>
                             </svg>
-                            <span class="reminders__item-date-text"><%- date %></span>
+                            <span class="reminders__item-date-text <% if (!title) { %>js-new-item-date-text<% } %>"><%- date %></span>
                         <% if (title) { %> 
                             </div>
                         <% } else { %>
@@ -37,7 +37,7 @@
                         <% if (title) { %> 
                             <div class="reminders__item-time">
                         <% } else { %>
-                            <button class="reminders__item-time reminders__button" type="button">
+                            <button class="reminders__item-time reminders__button js-new-item-time-btn" type="button">
                         <% } %>
                             <svg class="reminders__time-svg reminders__svg" version="1.1" id="Capa_2" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
                                 viewBox="0 0 512 512" style="enable-background:new 0 0 512 512;" xml:space="preserve">
@@ -52,7 +52,7 @@
                                     S375.275,472.341,256,472.341z"/>
                             </g></g>
                             </svg>
-                            <span class="reminders__item-time-text"><%- time %></span>
+                            <span class="reminders__item-time-text <% if (!title) { %>js-new-item-time-text<% } %>"><%- time %></span>
                         <% if (title) { %> 
                             </div>
                         <% } else { %>

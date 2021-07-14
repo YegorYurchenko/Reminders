@@ -35,6 +35,7 @@ body {
     &__content {
         width: 600px;
         height: 85%;
+        box-shadow: 0 5px 20px -4px rgba(0, 0, 0, .5);
 
         @media (max-width: grid('md')) {
             width: 400px;

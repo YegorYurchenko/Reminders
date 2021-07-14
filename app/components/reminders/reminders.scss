@@ -1,8 +1,9 @@
 .reminders {
     height: 100%;
     width: 100%;
-    background-color: color('white');
     font-size: 40px;
+    border-radius: 0 0 6px 6px;
+    background-color: color('white');
 
     @media (max-width: grid('xs')) {
         font-size: 20px;

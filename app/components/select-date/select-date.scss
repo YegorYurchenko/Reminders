@@ -1,0 +1,210 @@
+.select-date {
+    z-index: 100;
+    position: fixed;
+    top: 0;
+    left: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0);
+    transition: background-color 0.25s ease-in-out;
+
+    &.is-visible {
+        visibility: visible;
+        background-color: rgba(0, 0, 0, .65);
+    }
+
+    &.is-active {
+        left: 0;
+    }
+
+    &__form {
+        position: relative;
+        width: 400px;
+        border-radius: 8px;
+        background-color: color('white');
+
+        @media (max-width: grid('xs')) {
+            width: 300px;
+        }
+    }
+
+    &__close-btn {
+        position: absolute;
+        display: block;
+        top: 15px;
+        right: 15px;
+        padding: 5px;
+    }
+
+    &__close-svg {
+        width: 20px;
+        height: 20px;
+        fill: color('white');
+    }
+
+    &__form-inner {
+        display: flex;
+        flex-direction: column;
+    }
+
+    &__title {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        height: 70px;
+        border-radius: 8px 8px 0 0;
+        background-color: color('green-dark');
+
+        @media (max-width: grid('xs')) {
+            height: 50px;
+        }
+    }
+
+    &__title-text {
+        margin: 0 0 0 15px;
+        color: color('white');
+        font-size: 20px;
+
+        @media (max-width: grid('xs')) {
+            font-size: 18px;
+        }
+    }
+
+    &__main-wrapper {
+        width: 100%;
+        height: 400px;
+    }
+
+    &__main-wrapper {
+        position: relative;
+    }
+
+    &__main {
+        margin: 30px 40px;
+
+        @media (max-width: grid('xs')) {
+            margin: 15px;
+        }
+    }
+
+    &__select-month-year {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    &__select-month, &__select-year {
+        display: flex;
+        justify-content: space-between;
+        width: 180px;
+        
+        @media (max-width: grid('xs')) {
+            width: 140px;
+        }
+    }
+
+    &__select-year {
+        width: 110px;
+    }
+
+    &__select-month-btn-decrease, &__select-year-btn-decrease {
+        transform: rotate(90deg);
+    }
+
+    &__select-month-btn-increase, &__select-year-btn-increase {
+        transform: rotate(-90deg);
+    }
+
+    &__select-btn {
+        position: relative;
+        display: inline-block;
+        width: 30px;
+        height: 30px;
+        transition: color 0.25s ease-in-out;
+
+        &.disabled {
+            pointer-events: none;
+            
+            &.select-date__select-btn::before, &.select-date__select-btn::after {
+                background-color: color('grey');
+            }
+        }
+
+        &::before {
+            content: "";
+            position: absolute;
+            left: calc(50% - 10px);
+            top: calc(50% - 7px);
+            height: 14px;
+            width: 3px;
+            background-color: color('blue-dark');
+            transform: translateX(10px) rotate(-45deg);
+            transform-origin: left bottom;
+        }
+
+        &::after {
+            content: "";
+            position: absolute;
+            left: calc(50% - 10px);
+            bottom: calc(50% - 7px);
+            height: 3px;
+            width: 14px;
+            background-color: color('blue-dark');
+            transform: translateX(10px) rotate(-45deg);
+            transform-origin: left bottom;
+        }
+    }
+
+    &__select-month-text, &__select-year-text {
+        line-height: 1.7;
+
+        @media (max-width: grid('xs')) {
+            font-size: 16px;
+        }
+    }
+
+    &__select-day-list {
+        display: flex;
+        justify-content: justify-content;
+        align-items: center;
+        flex-wrap: wrap;
+        margin: 40px 0 0;
+    }
+
+    &__select-day-btn {
+        margin: 0 10px 10px 0;
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        font-size: 18px;
+        transition: background-color 0.25s ease-in-out;
+
+        &:nth-child(7n) {
+            margin: 0 0 10px 0;
+        }
+
+        &:hover {
+            background-color: color('grey-light');
+        }
+
+        &.is-active {
+            background-color: color('grey');
+        }
+    }
+
+    &__submit {
+        position: absolute;
+        bottom: 20px;
+        right: 30px;
+        font-size: 20px;
+        color: color('grey');
+        pointer-events: none;
+
+        &.is-active {
+            pointer-events: all;
+            color: color('blue');
+        }
+    }
+}
