@@ -1,0 +1,45 @@
+<div class="select-time js-select-time">
+    <form class="select-time__form">
+        <button class="select-time__close-btn js-time-close-btn" type="button">
+            <svg class='select-time__close-svg' version='1.1' xmlns='http://www.w3.org/2000/svg'
+                viewBox='0 0 32.526 32.526'>
+                <polygon
+                    points='32.526,2.828 29.698,0 16.263,13.435 2.828,0 0,2.828 13.435,16.263 0,29.698 2.828,32.526 16.263,19.091 29.698,32.526 32.526,29.698 19.091,16.263 ' />
+            </svg>
+        </button>
+        <div class="select-time__form-inner">
+            <div class="select-time__title">
+                <span class="select-time__title-text">
+                    Select time
+                </span>
+            </div>
+            <div class="select-time__main-wrapper">
+                <div class="select-time__main">
+                    <div class="select-time__select-hour-wrapper">
+                        <div class="select-time__select-hour js-select-hour">
+                            <button  class="select-time__select-hour-btn-decrease select-time__select-btn js-hour-decrease-btn" type="button"></button>
+                            <span class="select-time__select-hour-text js-select-hour-value" data-hour="12">
+                                12
+                            </span>
+                            <button class="select-time__select-hour-btn-increase select-time__select-btn js-hour-increase-btn" type="button"></button>
+                        </div>
+                        <span class="select-time__select-hour-static-text">часов</span>
+                    </div>
+
+                    <div class="select-time__select-minutes-wrapper">
+                        <div class="select-time__select-minute js-select-minute">
+                            <button class="select-time__select-minute-btn-decrease select-time__select-btn js-minute-decrease-btn" type="button"></button>
+                            <span class="select-time__select-minute-text js-select-minute-value" data-minute="30">
+                                30
+                            </span>
+                            <button class="select-time__select-minute-btn-increase select-time__select-btn js-minute-increase-btn" type="button"></button>
+                        </div>
+                        <span class="select-time__select-minute-static-text">минут</span>
+                    </div>
+
+                    <button class="select-time__submit js-select-time-submit" type="button">SAVE</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>

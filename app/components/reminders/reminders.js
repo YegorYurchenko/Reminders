@@ -7,18 +7,18 @@ class Reminders {
         this.remindersInner = this.reminders.querySelector('.js-reminders-inner');
 
         this.months = {
-            1: "Jan",
-            2: "Feb",
-            3: "Mar",
-            4: "Apr",
-            5: "May",
-            6: "June",
-            7: "July",
-            8: "Aug",
-            9: "Sept",
-            10: "Oct",
-            11: "Nov",
-            12: "Dec"
+            0: "Jan",
+            1: "Feb",
+            2: "Mar",
+            3: "Apr",
+            4: "May",
+            5: "June",
+            6: "July",
+            7: "Aug",
+            8: "Sept",
+            9: "Oct",
+            10: "Nov",
+            11: "Dec"
         };
 
         this.init();
@@ -75,7 +75,7 @@ class Reminders {
                 const tmplData = {
                     title: itemData.title,
                     date: this.getReceivedDate(itemData.date),
-                    time: Reminders.getReceivedTime(itemData.time, itemData.timeZone)
+                    time: Reminders.getReceivedTime(itemData.time)
                 };
 
                 reminderItems += tmpl(tmplData);
@@ -99,11 +99,10 @@ class Reminders {
     /**
      * Получаем время в нужной форме
      * @param {Object} time - объект с часом и минутой
-     * @param {string} timeZone - AM или PM
      * @returns {string}
      */
-    static getReceivedTime(time, timeZone) {
-        return `${time.hours}:${time.minutes} ${timeZone}`;
+    static getReceivedTime(time) {
+        return `${time.hours}:${time.minutes}`;
     }
 }
 

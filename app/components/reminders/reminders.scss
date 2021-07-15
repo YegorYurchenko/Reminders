@@ -63,8 +63,27 @@
         display: flex;
         align-items: center;
     }
+
+    &__item-date {
+        width: 120px;
+
+        @media (max-width: grid('xs')) {
+            width: 105px;
+        }
+    }
     
     &__button {
+        width: auto;
+
+        &:last-child {
+            display: none;
+            
+            &.is-active {
+                display: flex;
+            }
+        }
+
+        
         &:hover {
             .reminders__svg {
                 fill: color('black');
@@ -89,7 +108,7 @@
         }
     }
 
-    &__calendar-svg {
+    &__calendar-svg, &__time-svg {
         margin-bottom: 2px;
     }
 
@@ -145,12 +164,14 @@
         }
     }
 
-    &__new-item-btn {
+    &__new-item-btn-submit {
         font-size: 18px;
-        color: color('grey-darker');
+        color: color('grey');
+        pointer-events: none;
         transition: color 0.25s ease-in-out;
 
-        &.completed {
+        &.is-active {
+            pointer-events: all;
             color: color('blue');
         }
     }

@@ -14,33 +14,33 @@ class SelectDate {
         this.dateSubmit = this.selectDateBlock.querySelector(".js-select-date-submit");
         
         this.months = {
-            "01": "January",
-            "02": "February",
-            "03": "March",
-            "04": "April",
-            "05": "May",
-            "06": "June",
-            "07": "July",
-            "08": "August",
-            "09": "September",
-            "10": "October",
-            "11": "November",
-            "12": "December"
+            "00": "January",
+            "01": "February",
+            "02": "March",
+            "03": "April",
+            "04": "May",
+            "05": "June",
+            "06": "July",
+            "07": "August",
+            "08": "September",
+            "09": "October",
+            "10": "November",
+            "11": "December"
         };
 
         this.shortMonths = {
-            "01": "Jan",
-            "02": "Feb",
-            "03": "Mar",
-            "04": "Apr",
-            "05": "May",
-            "06": "June",
-            "07": "July",
-            "08": "Aug",
-            "09": "Sept",
-            "10": "Oct",
-            "11": "Nov",
-            "12": "Dec"
+            "00": "Jan",
+            "01": "Feb",
+            "02": "Mar",
+            "03": "Apr",
+            "04": "May",
+            "05": "June",
+            "06": "July",
+            "07": "Aug",
+            "08": "Sept",
+            "09": "Oct",
+            "10": "Nov",
+            "11": "Dec"
         };
         
         this.classes = {
@@ -214,8 +214,8 @@ class SelectDate {
      */
     getCurrentDate() {
         const date = new Date();
-        const currentYear = date.getFullYear(0);
-        const currentMonth = `0${date.getMonth() + 1}`;
+        const currentYear = date.getFullYear();
+        const currentMonth = `0${date.getMonth()}`;
 
         return [currentYear, currentMonth];
     }
@@ -229,17 +229,29 @@ class SelectDate {
     selectDay(element, elementType) {
         let value = null;
 
+        // Текущие и полученые значения года и месяца
+        const year = +this.selectYear.getAttribute("data-year");
+        const month = this.selectMonth.getAttribute("data-month");
+        const [currentYear, currentMonth] = this.getCurrentDate();
+
+        // Текущие день
+        const currentDay = new Date().getDate();
+
         if (elementType === "button") {
             value = element.getAttribute("data-value");
-            this.selectDayBlock.setAttribute("data-day", value);
 
-            this.daysList.forEach((day) => {
-                day.classList.remove(this.classes.active);
-            });
+            // Если это не прошлое время, то выбираем
+            if ((currentYear < year || currentMonth < month) || currentDay <= value) {
+                this.selectDayBlock.setAttribute("data-day", value);
 
-            element.classList.add(this.classes.active);
+                this.daysList.forEach((day) => {
+                    day.classList.remove(this.classes.active);
+                });
 
-            this.dateSubmit.classList.add(this.classes.active);
+                element.classList.add(this.classes.active);
+
+                this.dateSubmit.classList.add(this.classes.active);
+            }
         }
     }
 
@@ -257,6 +269,10 @@ class SelectDate {
         newRemindItem.setAttribute("data-year", year);
         newRemindItem.setAttribute("data-month", month);
         newRemindItem.setAttribute("data-day", day);
+
+        // Включим кнопку выбора времени (чтобы не было проблем с прошедшим временем)
+        const selectTime = newRemindItem.querySelector(".js-new-item-time-btn")
+        selectTime.classList.add(this.classes.active);
 
         this.closeSelectDatePopup();
 
