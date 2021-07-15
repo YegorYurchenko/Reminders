@@ -156,6 +156,7 @@ class SelectTime {
             return false;
         }
 
+        // Делаем Submit активным
         this.timeSubmit.classList.add(this.classes.active);
 
         return true;
@@ -171,8 +172,8 @@ class SelectTime {
 
         // Добавим дату в соответствующие атрибуты
         const newRemindItem = this.selectTimeBlock.parentElement.querySelector(".js-new-remind-item-form");
-        newRemindItem.setAttribute("data-hour", hour);
-        newRemindItem.setAttribute("data-minute", minute);
+        newRemindItem.setAttribute("data-hour", hour.padStart(2, "0"));
+        newRemindItem.setAttribute("data-minute", minute.padStart(2, "0"));
 
         this.closeSelectTimePopup();
 
@@ -209,6 +210,15 @@ class SelectTime {
             this.hourIncreaseBtn.classList.add(this.classes.disabled);
         } else {
             this.hourIncreaseBtn.classList.remove(this.classes.disabled);
+        }
+
+        // Заменяем значения минут на предельные, чтобы измежать переполнения
+        if (minute < 5) {
+            this.selectMinute.setAttribute("data-minute", "0");
+            this.selectMinute.innerHTML = "0";
+        } else if (minute > 55) {
+            this.selectMinute.setAttribute("data-minute", "55");
+            this.selectMinute.innerHTML = "55";
         }
 
         // Если это 0 минут, то меньше быть не может

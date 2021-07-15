@@ -1,6 +1,6 @@
 <script id="reminders-item-template" type="text/template">
     <% if (title) { %> 
-        <div class="reminders__item">
+        <div class="reminders__item" id="<%-id %>" date="<%- dateAndTime %>">
             <div class="reminders__item-content">
                 <div class="reminders__item-title"><%= title %></div>
     <% } %>

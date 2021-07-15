@@ -73,6 +73,8 @@ class Reminders {
         if (data.length !== 0) {
             data.forEach(itemData => {
                 const tmplData = {
+                    id: itemData.id,
+                    dateAndTime: this.getDateAndTime(itemData.date, itemData.time),
                     title: itemData.title,
                     date: this.getReceivedDate(itemData.date),
                     time: Reminders.getReceivedTime(itemData.time)
@@ -97,12 +99,22 @@ class Reminders {
     }
 
     /**
+     * Получаем дату (через запятую все данные)
+     * @param {Object} date - объект с годом, месяцем и днём
+     * @param {Object} time - объект с часом и минутой
+     * @returns {string}
+     */
+    getDateAndTime(date, time) {
+        return `${date.year}, ${date.month}, ${date.day}, ${time.hour}, ${time.minute}`;
+    }
+
+    /**
      * Получаем время в нужной форме
      * @param {Object} time - объект с часом и минутой
      * @returns {string}
      */
     static getReceivedTime(time) {
-        return `${time.hours}:${time.minutes}`;
+        return `${time.hour}:${time.minute}`;
     }
 }
 
