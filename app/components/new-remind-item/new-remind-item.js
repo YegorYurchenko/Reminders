@@ -175,10 +175,15 @@ class NewRemindItem {
         // Выбранная дата и время
         const [year, month, day, hour, minute] = this.getDateInfo();
         const selectedDate = new Date(year, month, day, hour, minute);
-        const diff = selectedDate - new Date();
+        const diff = selectedDate - new Date(+new Date() + 1 * 6e4); // Добавим 1 минуту для устранения проблем со временем
+
+        const textError = this.newRemindItem.querySelector(".js-new-remind-item-error");
 
         // Если это не прошедшее время
         if (diff > 0) {
+            // Удалим текст ошибки
+            textError.classList.remove(this.classes.active);
+
             // Получим список всех Remind items
             const allRemindItems = document.querySelector(".js-reminders-inner");
             let variants = allRemindItems.innerHTML.split('class="reminders__item"');
@@ -230,6 +235,8 @@ class NewRemindItem {
                 .catch((e) => {
                     console.error(e);
                 });
+        } else {
+            textError.classList.add(this.classes.active);
         }
     }
 
@@ -260,6 +267,12 @@ class NewRemindItem {
 
         // Добавим элементы в DOM
         allRemindItems.innerHTML = newRemindItemsList;
+
+        // Закроем попап создания нового Remind
+        this.newRemindItem.classList.remove(this.classes.visible);
+        setTimeout(() => { // Задержка для плавного скрытия popup
+            this.newRemindItem.classList.remove(this.classes.active);
+        }, 150);
     }
 
     /**
