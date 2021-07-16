@@ -21,6 +21,10 @@ class Reminders {
             11: "Dec"
         };
 
+        this.classes = {
+            active: "is-active"
+        };
+
         this.init();
     }
 
@@ -39,6 +43,7 @@ class Reminders {
                     case "GET_REMINDERS_LIST_SUCCESS":
                         setTimeout(() => {
                             this.remindersInner.innerHTML = this.getReminderData(receivedData.data);
+                            this.setListeners();
                         }, 800);
                         break;
                     case "GET_REMINDERS_LIST_FAIL":
@@ -115,6 +120,53 @@ class Reminders {
      */
     static getReceivedTime(time) {
         return `${time.hour}:${time.minute}`;
+    }
+
+    setListeners() {
+        this.actionsBtns = this.remindersInner.querySelectorAll('.js-remind-actions-btn');
+        this.actionsBtns.forEach((actionBtn) => {
+            // Нужный блок Actions
+            const actionBlock = actionBtn.nextElementSibling;
+
+            // Открытие/закрытие нужного блока Actions
+            actionBtn.addEventListener("click", () => {
+                this.toggleActionsVisibility(actionBlock);
+            });
+
+            // Закрытие нужного Actions при клике вне блока
+            document.body.addEventListener("click", (e) => {
+                this.handleMilkClick(e, actionBtn, actionBlock);
+            });
+        });
+    }
+
+    /**
+     * Открываем/закрываем Actions
+     * @param {object} actionBlock - блок с кнопками "Edit" и "Remove"
+     * @returns {void}
+     */
+    toggleActionsVisibility(actionBlock) {
+        if (!actionBlock.classList.contains(this.classes.active)) {
+            actionBlock.classList.add(this.classes.active);
+        } else {
+            actionBlock.classList.remove(this.classes.active);
+        }
+    }
+
+    /**
+     * Закрываем Actions при клике вне блока
+     * @param {object} e - блок с кнопками "Edit" и "Remove"
+     * @param {object} actionBtn - кнопка открытия блока Actions
+     * @param {object} actionBlock - блок с кнопками "Edit" и "Remove"
+     * @returns {void}
+     */
+    handleMilkClick(e, actionBtn, actionBlock) {
+        if (
+            e.target !== actionBtn
+            && actionBlock.classList.contains(this.classes.active)
+        ) {
+            this.toggleActionsVisibility(actionBlock);
+        }
     }
 }
 
