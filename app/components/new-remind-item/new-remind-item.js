@@ -204,7 +204,7 @@ class NewRemindItem {
 
             let newRemindItemHtml = null;
 
-            // Отправляем на сервер новый Remind (пока что get, потом ПЕРЕДЕЛАТЬ)
+            // Отправляем на сервер новый Remind (пока что get, потом ПЕРЕДЕЛАТЬ НА POST)
             axios({
                 method: this.newRemindItemInner.getAttribute("data-method") || "get",
                 url: this.newRemindItemInner.getAttribute("data-url")
@@ -214,7 +214,7 @@ class NewRemindItem {
                     switch (receivedData.status) {
                         case "GET_NEW_REMINDER_ITEM_SUCCESS":
                             newRemindItemHtml = NewRemindItem.getReminderData(
-                                receivedData.data.id,
+                                "remind_" + Math.floor(Math.random() * 1000 + 10), // ПОТОМ ИСПРАВИТЬ НА receivedData.data.id,
                                 `${year}, ${month}, ${day}, ${hour}, ${minute}`,
                                 this.newRemindItemTitle.value,
                                 this.getReceivedDate(month, day, year),
@@ -298,11 +298,11 @@ class NewRemindItem {
 
     /**
     * Добавляем новый Remind в общий список с помощью template
-    * @param {Object} id - id нового Remind
-    * @param {Object} dateAndTime - dateAndTime нового Remind
-    * @param {Object} title - title нового Remind
-    * @param {Object} date - date нового Remind
-    * @param {Object} time - time нового Remind
+    * @param {number} id - id нового Remind
+    * @param {string} dateAndTime - dateAndTime нового Remind
+    * @param {string} title - title нового Remind
+    * @param {string} date - date нового Remind
+    * @param {string} time - time нового Remind
     * @returns {string}
     */
     static getReminderData(id, dateAndTime, title, date, time) {
