@@ -6,7 +6,7 @@ class Reminders {
         this.reminders = el;
         this.remindersInner = this.reminders.querySelector('.js-reminders-inner');
 
-        this.date = {
+        this.months = {
             0: "Jan",
             1: "Feb",
             2: "Mar",
@@ -18,7 +18,7 @@ class Reminders {
             8: "Sept",
             9: "Oct",
             10: "Nov",
-            11: "Dec",
+            11: "Dec"
         };
 
         this.init();
@@ -38,7 +38,7 @@ class Reminders {
                 switch (receivedData.status) {
                     case "GET_REMINDERS_LIST_SUCCESS":
                         setTimeout(() => {
-                            this.remindersInner.innerHTML = this.getEmojiData(receivedData.data);
+                            this.remindersInner.innerHTML = this.getReminderData(receivedData.data);
                         }, 800);
                         break;
                     case "GET_REMINDERS_LIST_FAIL":
@@ -65,17 +65,19 @@ class Reminders {
      * @param {Object} data - данные из AJAX-запроса
      * @returns {string}
      */
-    getEmojiData(data) {
-        const emojiListTemplate = document.getElementById("reminders-item");
-        const tmpl = template(emojiListTemplate.innerHTML);
+    getReminderData(data) {
+        const reminderItemsTemplate = document.getElementById("reminders-item-template");
+        const tmpl = template(reminderItemsTemplate.innerHTML);
         let reminderItems = "";
 
         if (data.length !== 0) {
             data.forEach(itemData => {
                 const tmplData = {
+                    id: itemData.id,
+                    dateAndTime: this.getDateAndTime(itemData.date, itemData.time),
                     title: itemData.title,
                     date: this.getReceivedDate(itemData.date),
-                    time: Reminders.getReceivedTime(itemData.time, itemData.timeZone)
+                    time: Reminders.getReceivedTime(itemData.time)
                 };
 
                 reminderItems += tmpl(tmplData);
@@ -87,12 +89,32 @@ class Reminders {
         return reminderItems;
     }
 
+    /**
+     * Получаем дату в нужной форме
+     * @param {Object} date - объект с годом, месяцем и днём
+     * @returns {string}
+     */
     getReceivedDate(date) {
-        return `${this.date[date.month]} ${date.day}, ${date.year}`;
+        return `${this.months[date.month]} ${date.day}, ${date.year}`;
     }
 
-    static getReceivedTime(time, timeZone) {
-        return `${time.hours}:${time.minutes} ${timeZone}`;
+    /**
+     * Получаем дату (через запятую все данные)
+     * @param {Object} date - объект с годом, месяцем и днём
+     * @param {Object} time - объект с часом и минутой
+     * @returns {string}
+     */
+    getDateAndTime(date, time) {
+        return `${date.year}, ${date.month}, ${date.day}, ${time.hour}, ${time.minute}`;
+    }
+
+    /**
+     * Получаем время в нужной форме
+     * @param {Object} time - объект с часом и минутой
+     * @returns {string}
+     */
+    static getReceivedTime(time) {
+        return `${time.hour}:${time.minute}`;
     }
 }
 

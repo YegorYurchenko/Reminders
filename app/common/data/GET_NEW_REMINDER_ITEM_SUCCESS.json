@@ -1,0 +1,7 @@
+{
+    "success": true,
+    "status": "GET_NEW_REMINDER_ITEM_SUCCESS",
+    "data": {
+        "id": 10
+    }
+}

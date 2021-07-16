@@ -1,0 +1,44 @@
+<div class="select-date js-select-date">
+    <form class="select-date__form">
+        <button class="select-date__close-btn js-date-close-btn" type="button">
+            <svg class='select-date__close-svg' version='1.1' xmlns='http://www.w3.org/2000/svg'
+                viewBox='0 0 32.526 32.526'>
+                <polygon
+                    points='32.526,2.828 29.698,0 16.263,13.435 2.828,0 0,2.828 13.435,16.263 0,29.698 2.828,32.526 16.263,19.091 29.698,32.526 32.526,29.698 19.091,16.263 ' />
+            </svg>
+        </button>
+        <div class="select-date__form-inner">
+            <div class="select-date__title">
+                <span class="select-date__title-text">
+                    Select date
+                </span>
+            </div>
+            <div class="select-date__main-wrapper">
+                <div class="select-date__main">
+                    <div class="select-date__select-month-year">
+                        <div class="select-date__select-month js-select-month">
+                            <button  class="select-date__select-month-btn-decrease select-date__select-btn js-month-decrease-btn" type="button"></button>
+                            <span class="select-date__select-month-text js-select-month-value" data-month="06">
+                                July
+                            </span>
+                            <button class="select-date__select-month-btn-increase select-date__select-btn js-month-increase-btn" type="button"></button>
+                        </div>
+
+                        <div class="select-date__select-year js-select-year">
+                            <button class="select-date__select-year-btn-decrease select-date__select-btn js-year-decrease-btn" type="button"></button>
+                            <span class="select-date__select-year-text js-select-year-value" data-year="2021">
+                                2021
+                            </span>
+                            <button class="select-date__select-year-btn-increase select-date__select-btn js-year-increase-btn" type="button"></button>
+                        </div>
+                    </div>
+                    <div class="select-date__select-day">
+                        <ul class="select-date__select-day-list js-select-day-list" data-day="">
+                        </ul>
+                    </div>
+                    <button class="select-date__submit js-select-date-submit" type="button">SAVE</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>

@@ -1,8 +1,9 @@
 .reminders {
     height: 100%;
     width: 100%;
-    background-color: color('white');
     font-size: 40px;
+    border-radius: 0 0 6px 6px;
+    background-color: color('white');
 
     @media (max-width: grid('xs')) {
         font-size: 20px;
@@ -46,6 +47,12 @@
         }
     }
 
+    &__item-main-wrapper {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
     &__item-main {
         display: flex;
         justify-content: flex-start;
@@ -57,11 +64,43 @@
         align-items: center;
     }
 
+    &__item-date {
+        width: 120px;
+
+        @media (max-width: grid('xs')) {
+            width: 105px;
+        }
+    }
+    
+    &__button {
+        width: auto;
+
+        &:last-child {
+            display: none;
+            
+            &.is-active {
+                display: flex;
+            }
+        }
+
+        
+        &:hover {
+            .reminders__svg {
+                fill: color('black');
+            }
+
+            .reminders__item-date-text, .reminders__item-time-text {
+                color: color('black');
+            }
+        }
+    }
+
     &__svg {
         margin: 0 5px 0 0;
         height: 15px;
         width: 15px;
         fill: color('grey-dark');
+        transition: fill 0.25s ease-in-out;
 
         @media (max-width: grid('xs')) {
             height: 13px;
@@ -69,8 +108,13 @@
         }
     }
 
-    &__calendar-svg {
+    &__calendar-svg, &__time-svg {
         margin-bottom: 2px;
+    }
+
+    &__item-date-text, &__item-time-text {
+        color: color('grey');
+        transition: color 0.25s ease-in-out;
     }
 
     &__item-content-separator {
@@ -117,6 +161,18 @@
             background-color: color('blue-dark');
             transform: translateX(10px) rotate(-45deg);
             transform-origin: left bottom;
+        }
+    }
+
+    &__new-item-btn-submit {
+        font-size: 18px;
+        color: color('grey');
+        pointer-events: none;
+        transition: color 0.25s ease-in-out;
+
+        &.is-active {
+            pointer-events: all;
+            color: color('blue');
         }
     }
 
