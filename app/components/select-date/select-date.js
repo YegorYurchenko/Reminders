@@ -308,7 +308,7 @@ class SelectDate {
         }
 
         // Если это Декабрь, то больше быть не может
-        if (month === "12") {
+        if (month === "11") {
             this.monthIncreaseBtn.classList.add(this.classes.disabled);
         } else {
             this.monthIncreaseBtn.classList.remove(this.classes.disabled);

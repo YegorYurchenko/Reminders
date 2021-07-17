@@ -19,7 +19,7 @@ class Header {
     }
 
     /**
-     * Открываем popup добавления нового item
+     * Открываем popup добавления нового Remind item
      * @returns {void}
      */
     openNewItemPopup() {

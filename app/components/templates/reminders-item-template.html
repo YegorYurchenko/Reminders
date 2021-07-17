@@ -1,8 +1,8 @@
 <script id="reminders-item-template" type="text/template">
     <% if (title) { %> 
-        <div class="reminders__item" id="<%-id %>" date="<%- dateAndTime %>">
+        <div class="reminders__item" id="<%-id %>" data-date-and-time="<%- dateAndTime %>">
             <div class="reminders__item-content">
-                <div class="reminders__item-title"><%= title %></div>
+                <div class="reminders__item-title js-remind-title"><%= title %></div>
     <% } %>
                 <div class="reminders__item-main-wrapper">
                     <div class="reminders__item-main <% if (!title) { %>js-new-item-block<% } %>">
@@ -25,7 +25,7 @@
                                             <rect x="6.724" y="14.626" width="4.595" height="4.089"/>
                                     </g></g>
                                 </svg>
-                                <span class="reminders__item-date-text <% if (!title) { %>js-new-item-date-text<% } %>"><%- date %></span>
+                                <span class="reminders__item-date-text js-new-item-date-text"><%- date %></span>
                         <% if (title) { %> 
                             </div>
                         <% } else { %>
@@ -52,7 +52,7 @@
                                         S375.275,472.341,256,472.341z"/>
                                 </g></g>
                                 </svg>
-                                <span class="reminders__item-time-text <% if (!title) { %>js-new-item-time-text<% } %>"><%- time %></span>
+                                <span class="reminders__item-time-text js-new-item-time-text"><%- time %></span>
                         <% if (title) { %> 
                             </div>
                         <% } else { %>
@@ -61,6 +61,7 @@
                     </div>
                     <% if (!title) { %>
                         <button class="reminders__new-item-btn-submit js-new-remind-item-submit" type="button">ADD</button>
+                        <button class="reminders__new-item-btn-submit js-new-remind-item-save is-hidden" type="button">SAVE</button>
                     <% } %>
                 </div>
     <% if (title) { %> 
