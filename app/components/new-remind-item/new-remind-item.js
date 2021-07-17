@@ -294,10 +294,11 @@ class NewRemindItem {
         this.newRemindItem.classList.remove(this.classes.visible);
         setTimeout(() => { // Задержка для плавного скрытия popup
             this.newRemindItem.classList.remove(this.classes.active);
+
+            // Обнулим все данные в попапе создания нового Remind
+            this.clearNewRemindPopup();
         }, 150);
 
-        // Обнулим все данные в попапе создания нового Remind
-        this.clearNewRemindPopup();
     }
 
     /**
@@ -417,10 +418,11 @@ class NewRemindItem {
                             this.newRemindItem.classList.remove(this.classes.visible);
                             setTimeout(() => { // Задержка для плавного скрытия popup
                                 this.newRemindItem.classList.remove(this.classes.active);
+
+                                // Обнулим все данные в попапе создания нового Remind
+                                this.clearNewRemindPopup();
                             }, 150);
 
-                            // Обнулим все данные в попапе создания нового Remind
-                            this.clearNewRemindPopup();
                             break;
                         case "GET_EDIT_REMIND_FAIL":
                             console.error(receivedData.data.errorMessage);

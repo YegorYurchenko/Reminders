@@ -37,6 +37,10 @@
         top: 15px;
         right: 15px;
         padding: 5px;
+
+        @media (max-width: grid('xs')) {
+            top: 10px;
+        }
     }
 
     &__close-svg {
