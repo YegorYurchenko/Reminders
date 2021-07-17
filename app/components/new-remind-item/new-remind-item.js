@@ -114,16 +114,17 @@ class NewRemindItem {
 
         setTimeout(() => { // Задержка для плавного скрытия popup
             this.newRemindItem.classList.remove(this.classes.active);
+
+            // Обнулим все данные в попапе создания нового Remind
+            this.clearNewRemindPopup();
+    
+            // Удалим текст ошибки
+            this.newRemindItem.querySelector(".js-new-remind-item-error").classList.remove(this.classes.active);
+    
+            // Деактивируем кнопку сохранения нового Remind
+            this.newRemindItemSubminBtn.classList.remove(this.classes.active);
         }, 150);
-
-        // Обнулим все данные в попапе создания нового Remind
-        this.clearNewRemindPopup();
-
-        // Удалим текст ошибки
-        this.newRemindItem.querySelector(".js-new-remind-item-error").classList.remove(this.classes.active);
-
-        // Деактивируем кнопку сохранения нового Remind
-        this.newRemindItemSubminBtn.classList.remove(this.classes.active);
+        
     }
 
     /**
@@ -160,7 +161,7 @@ class NewRemindItem {
         el.value = value.trimLeft();
 
         // Если Дата и Время выбраны
-        if (value.length > 4) {
+        if (value.trim().length > 3) {
             const [year, month, day, hour, minute] = this.getDateInfo();
 
             if (year && month && day && hour && minute) {
