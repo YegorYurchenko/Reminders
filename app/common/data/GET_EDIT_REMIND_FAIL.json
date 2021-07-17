@@ -1,0 +1,7 @@
+{
+    "success": true,
+    "status": "GET_EDIT_REMIND_FAIL",
+    "data": {
+        "errorMessage": "Ошибка"
+    }
+}

@@ -2,7 +2,7 @@ class Header {
     constructor(el) {
         this.header = el;
         this.addNewItemBtn = this.header.querySelector('.js-header-add-new-item');
-        this.addNewItemForm = this.header.querySelector('.js-new-remind-item');
+        this.addNewItemForm = document.querySelector('.js-new-remind-item');
 
         this.classes = {
             active: "is-active",
@@ -19,7 +19,7 @@ class Header {
     }
 
     /**
-     * Открываем popup добавления нового item
+     * Открываем popup добавления нового Remind item
      * @returns {void}
      */
     openNewItemPopup() {

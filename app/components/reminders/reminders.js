@@ -6,19 +6,28 @@ class Reminders {
         this.reminders = el;
         this.remindersInner = this.reminders.querySelector('.js-reminders-inner');
 
+        this.editRemindFormBlock = document.querySelector('.js-new-remind-item');
+        this.editRemindForm = document.querySelector('.js-new-remind-item-form');
+
         this.months = {
-            0: "Jan",
-            1: "Feb",
-            2: "Mar",
-            3: "Apr",
-            4: "May",
-            5: "June",
-            6: "July",
-            7: "Aug",
-            8: "Sept",
-            9: "Oct",
-            10: "Nov",
-            11: "Dec"
+            "00": "Jan",
+            "01": "Feb",
+            "02": "Mar",
+            "03": "Apr",
+            "04": "May",
+            "05": "June",
+            "06": "July",
+            "07": "Aug",
+            "08": "Sept",
+            "09": "Oct",
+            "10": "Nov",
+            "11": "Dec"
+        };
+
+        this.classes = {
+            active: "is-active",
+            visible: "is-visible",
+            hidden: "is-hidden"
         };
 
         this.init();
@@ -39,6 +48,7 @@ class Reminders {
                     case "GET_REMINDERS_LIST_SUCCESS":
                         setTimeout(() => {
                             this.remindersInner.innerHTML = this.getReminderData(receivedData.data);
+                            this.setListeners();
                         }, 800);
                         break;
                     case "GET_REMINDERS_LIST_FAIL":
@@ -115,6 +125,213 @@ class Reminders {
      */
     static getReceivedTime(time) {
         return `${time.hour}:${time.minute}`;
+    }
+
+    setListeners() {
+        // Действия с блоком Actions
+        this.listenActionsEvents();
+
+        // Обновим все блоки Actions после обновления Remind items
+        this.remindersInner.addEventListener("DOMSubtreeModified", () => {
+            this.listenActionsEvents();
+        });
+    }
+
+    /**
+     * Действия с блоком Actions
+     * @returns {void}
+     */
+    listenActionsEvents() {
+        this.actionsBtns = this.remindersInner.querySelectorAll('.js-remind-actions-btn');
+        this.actionsBtns.forEach((actionBtn) => {
+            // Нужный блок Actions
+            const actionBlock = actionBtn.nextElementSibling;
+
+            // Кнопка изменения Edit
+            const editRemindBtn = actionBlock.querySelector('.js-remind-edit');
+
+            // Кнопка удаления Remind
+            const removeRemindBtn = actionBlock.querySelector('.js-remind-remove');
+            
+            // Открытие/закрытие нужного блока Actions
+            actionBtn.addEventListener("click", () => {
+                this.toggleActionsVisibility(actionBlock);
+            });
+            
+            // Закрытие нужного Actions при клике вне блока
+            document.body.addEventListener("click", (e) => {
+                this.handleMilkClick(e, actionBtn, actionBlock);
+            });
+
+            // Удаление Remind
+            removeRemindBtn.addEventListener("click", () => {
+                // Получим ID выбранного Remind
+                const remindItemId = removeRemindBtn.closest(".reminders__item").getAttribute("id");
+                this.removeRemind(remindItemId);
+            });
+
+            // Открытие попапа изменения Remind
+            editRemindBtn.addEventListener("click", () => {
+                // Нужный Remind
+                const remindItem = removeRemindBtn.closest(".reminders__item");
+
+                // Добавим уже существующие данные
+                this.addRemindInfo(remindItem);
+            });
+        });   
+    }
+
+    /**
+     * Открываем/закрываем Actions
+     * @param {object} actionBlock - блок с кнопками "Edit" и "Remove"
+     * @returns {void}
+     */
+    toggleActionsVisibility(actionBlock) {
+        if (!actionBlock.classList.contains(this.classes.active)) {
+            actionBlock.classList.add(this.classes.active);
+        } else {
+            actionBlock.classList.remove(this.classes.active);
+        }
+    }
+
+    /**
+     * Закрываем Actions при клике вне блока
+     * @param {object} e - блок с кнопками "Edit" и "Remove"
+     * @param {object} actionBtn - кнопка открытия блока Actions
+     * @param {object} actionBlock - блок с кнопками "Edit" и "Remove"
+     * @returns {void}
+     */
+    handleMilkClick(e, actionBtn, actionBlock) {
+        if (
+            e.target !== actionBtn
+            && actionBlock.classList.contains(this.classes.active)
+        ) {
+            this.toggleActionsVisibility(actionBlock);
+        }
+    }
+
+    /**
+     * Удаление выбранного Remind из списка
+     * @param {string} chosenRemindId - ID выбранного Remind
+     * @returns {void}
+     */
+    removeRemind(chosenRemindId) {
+        // Все Reminds
+        let variants = this.remindersInner.innerHTML.split('class="reminders__item"');
+
+        const RegExp = /remind_\d{1,}/;
+        let position = variants.length - 1;
+
+        // Найдём, какой Remind нужно удалить (ищем по id)
+        for (let i = 1; i < variants.length; i++) {
+            let remindId = RegExp.exec(variants[i])[0];
+
+            if (remindId === chosenRemindId) {
+                position = i - 1;
+                break;
+            }
+        }
+
+        // Отправляем на сервер id Remind, который нужно удалить (пока что get, потом ПЕРЕДЕЛАТЬ НА POST)
+        axios({
+            method: this.remindersInner.getAttribute("data-remove-method") || "get",
+            url: this.remindersInner.getAttribute("data-remove-url")
+        })
+            .then((response) => {
+                const receivedData = response.data;
+                switch (receivedData.status) {
+                    case "GET_REMOVE_REMIND_SUCCESS":
+                        // Удалим выбранный Remind из списка
+                        this.removeRemindItem(variants.slice(1), position);
+                        break;
+                    case "GET_REMOVE_REMIND_FAIL":
+                        console.error(receivedData.data.errorMessage);
+                        break;
+                    default:
+                        console.error("Что-то пошло не так!");
+                        break;
+                }
+            })
+            .catch((e) => {
+                console.error(e);
+            });
+    }
+
+    /**
+     * Изменяем список Reminds (удаляем выбранный Remind)
+     * @param {Object} variants - все Remind items
+     * @param {number} position - позиция, какой Remind нужно удалить
+     * @returns {string}
+     */
+    removeRemindItem(variants, position) {
+        let newRemindItemsList = '';
+
+        // Добавляем каждый элемент по очереди (на position не будем вставлять Remind)
+        for (let i = 0; i < variants.length; i++) {
+            if (i === position) {
+                continue;
+            }
+
+            newRemindItemsList += '<div class="reminders__item"' + variants[i];
+        }
+
+        if (!newRemindItemsList) {
+            newRemindItemsList += "<span class='reminders__empty'>You have no reminders yet! It's time to add one</span>";
+        }
+
+        // Добавим элементы в DOM
+        this.remindersInner.innerHTML = newRemindItemsList;
+    }
+
+    /**
+     * Добавление существующих данных в попап изменения данных
+     * @param {object} remindItem - dom-элемент нужного Remind
+     * @returns {void}
+     */
+    addRemindInfo(remindItem) {
+        // Соберём все известные данные
+        let dateAndTime = remindItem.getAttribute("data-date-and-time").split(",");
+        dateAndTime = dateAndTime.map(item => +item); // массив вида [year, month, day, hour, minute]
+
+        const remindId = remindItem.getAttribute("id");
+        const remindTitle = remindItem.querySelector(".js-remind-title").innerHTML;
+        const remindDate = remindItem.querySelector(".js-new-item-date-text").innerHTML;
+        const remindTime = remindItem.querySelector(".js-new-item-time-text").innerHTML;
+
+        // Откроем попап изменения данных Remind
+        this.openEditRemindInfo();
+
+        // Добавим все изместные данные
+        this.editRemindForm.setAttribute("data-id", remindId);
+        this.editRemindForm.setAttribute("data-year", dateAndTime[0]);
+        this.editRemindForm.setAttribute("data-month", dateAndTime[1]);
+        this.editRemindForm.setAttribute("data-day", dateAndTime[2]);
+        this.editRemindForm.setAttribute("data-hour", dateAndTime[3]);
+        this.editRemindForm.setAttribute("data-minute", dateAndTime[4]);
+        this.editRemindForm.querySelector(".js-new-remind-item-title").value = remindTitle;
+        this.editRemindForm.querySelector(".js-new-item-date-text").innerHTML = remindDate;
+
+        // Активируем кнопку выбора времени
+        this.editRemindForm.querySelector(".js-new-item-time-btn").classList.add(this.classes.active);
+        this.editRemindForm.querySelector(".js-new-item-time-text").innerHTML = remindTime;
+    }
+
+    /**
+     * Открываем popup изменения Remind item
+     * @returns {void}
+     */
+    openEditRemindInfo() {
+        this.editRemindFormBlock.classList.add(this.classes.visible);
+
+        setTimeout(() => {
+            this.editRemindFormBlock.classList.add(this.classes.active);
+        }, 33);
+
+        this.editRemindForm.querySelector(".js-new-remind-item-submit").classList.add(this.classes.hidden);
+
+        const saveChangesBtn = this.editRemindForm.querySelector(".js-new-remind-item-save");
+        saveChangesBtn.classList.remove(this.classes.hidden);
+        saveChangesBtn.classList.add(this.classes.active);
     }
 }
 

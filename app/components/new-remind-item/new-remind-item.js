@@ -26,7 +26,8 @@ class NewRemindItem {
 
         this.classes = {
             active: "is-active",
-            visible: "is-visible"
+            visible: "is-visible",
+            hidden: "is-hidden"
         };
         
         this.setListener();
@@ -70,8 +71,16 @@ class NewRemindItem {
         // Submit создания нового Remind
         setTimeout(() => {
             this.newRemindItemSubminBtn = document.querySelector(".js-new-remind-item-submit");
+            this.remindItemSaveBtn = document.querySelector(".js-new-remind-item-save");
             this.newRemindItemSubminBtn.addEventListener("click", () => {
                 this.createNewRemindItem();
+            });
+        }, 50);
+
+        // Save новых значений для старого Remind
+        setTimeout(() => {
+            this.remindItemSaveBtn.addEventListener("click", () => {
+                this.saveNewRemindInfo();
             });
         }, 50);
     }
@@ -106,6 +115,15 @@ class NewRemindItem {
         setTimeout(() => { // Задержка для плавного скрытия popup
             this.newRemindItem.classList.remove(this.classes.active);
         }, 150);
+
+        // Обнулим все данные в попапе создания нового Remind
+        this.clearNewRemindPopup();
+
+        // Удалим текст ошибки
+        this.newRemindItem.querySelector(".js-new-remind-item-error").classList.remove(this.classes.active);
+
+        // Деактивируем кнопку сохранения нового Remind
+        this.newRemindItemSubminBtn.classList.remove(this.classes.active);
     }
 
     /**
@@ -147,9 +165,11 @@ class NewRemindItem {
 
             if (year && month && day && hour && minute) {
                 this.newRemindItemSubminBtn.classList.add(this.classes.active);
+                this.remindItemSaveBtn.classList.add(this.classes.active);
             }
         } else {
             this.newRemindItemSubminBtn.classList.remove(this.classes.active);
+            this.remindItemSaveBtn.classList.remove(this.classes.active);
         }
     }
 
@@ -159,10 +179,10 @@ class NewRemindItem {
      */
     getDateInfo() {
         const year = this.newRemindItemInner.getAttribute("data-year");
-        const month = this.newRemindItemInner.getAttribute("data-month");
-        const day = this.newRemindItemInner.getAttribute("data-day");
-        const hour = this.newRemindItemInner.getAttribute("data-hour");
-        const minute = this.newRemindItemInner.getAttribute("data-minute");
+        const month = this.newRemindItemInner.getAttribute("data-month").padStart(2, "0");
+        const day = this.newRemindItemInner.getAttribute("data-day").padStart(2, "0");
+        const hour = this.newRemindItemInner.getAttribute("data-hour").padStart(2, "0");
+        const minute = this.newRemindItemInner.getAttribute("data-minute").padStart(2, "0");
 
         return [year, month, day, hour, minute];
     }
@@ -204,7 +224,7 @@ class NewRemindItem {
 
             let newRemindItemHtml = null;
 
-            // Отправляем на сервер новый Remind (пока что get, потом ПЕРЕДЕЛАТЬ)
+            // Отправляем на сервер новый Remind (пока что get, потом ПЕРЕДЕЛАТЬ НА POST)
             axios({
                 method: this.newRemindItemInner.getAttribute("data-method") || "get",
                 url: this.newRemindItemInner.getAttribute("data-url")
@@ -213,8 +233,9 @@ class NewRemindItem {
                     const receivedData = response.data;
                     switch (receivedData.status) {
                         case "GET_NEW_REMINDER_ITEM_SUCCESS":
+                            // Сформируем новый Remind
                             newRemindItemHtml = NewRemindItem.getReminderData(
-                                receivedData.data.id,
+                                "remind_" + Math.floor(Math.random() * 1000 + 10), // ПОТОМ ИСПРАВИТЬ НА receivedData.data.id,
                                 `${year}, ${month}, ${day}, ${hour}, ${minute}`,
                                 this.newRemindItemTitle.value,
                                 this.getReceivedDate(month, day, year),
@@ -273,6 +294,35 @@ class NewRemindItem {
         setTimeout(() => { // Задержка для плавного скрытия popup
             this.newRemindItem.classList.remove(this.classes.active);
         }, 150);
+
+        // Обнулим все данные в попапе создания нового Remind
+        this.clearNewRemindPopup();
+    }
+
+    /**
+     * Очищаем данные из попапа создания нового Remind
+     * @returns {string}
+     */
+    clearNewRemindPopup() {
+        this.newRemindItemInner.setAttribute("data-year", "");
+        this.newRemindItemInner.setAttribute("data-month", "");
+        this.newRemindItemInner.setAttribute("data-day", "");
+        this.newRemindItemInner.setAttribute("data-hour", "");
+        this.newRemindItemInner.setAttribute("data-minute", "");
+
+        // Вернём в первоначальное состояние
+        this.newRemindItemTitle.value = "";
+        this.newRemindItem.querySelector(".js-new-item-date-text").innerHTML = "Set Date";
+        this.newRemindItem.querySelector(".js-new-item-time-text").innerHTML = "Set Time";
+        this.newRemindItem.querySelector(".js-new-item-time-btn").classList.remove(this.classes.active); // Кнопка не активна
+
+        // Активируем кнопку сохранения новых данных
+        this.newRemindItemSubminBtn.classList.remove(this.classes.hidden);
+        const saveChangesBtn = this.newRemindItemInner.querySelector(".js-new-remind-item-save");
+
+        // Деактивируем кнопку изменения существующих данных
+        saveChangesBtn.classList.add(this.classes.hidden);
+        saveChangesBtn.classList.remove(this.classes.active);
     }
 
     /**
@@ -298,11 +348,11 @@ class NewRemindItem {
 
     /**
     * Добавляем новый Remind в общий список с помощью template
-    * @param {Object} id - id нового Remind
-    * @param {Object} dateAndTime - dateAndTime нового Remind
-    * @param {Object} title - title нового Remind
-    * @param {Object} date - date нового Remind
-    * @param {Object} time - time нового Remind
+    * @param {number} id - id нового Remind
+    * @param {string} dateAndTime - dateAndTime нового Remind
+    * @param {string} title - title нового Remind
+    * @param {string} date - date нового Remind
+    * @param {string} time - time нового Remind
     * @returns {string}
     */
     static getReminderData(id, dateAndTime, title, date, time) {
@@ -321,6 +371,70 @@ class NewRemindItem {
         reminderItems += tmpl(tmplData);
 
         return reminderItems;
+    }
+
+    /**
+     * Обновление данных уже существующего Remind
+     * @returns {void}
+     */
+    saveNewRemindInfo() {
+        // Получим выбранную дату и время
+        const [year, month, day, hour, minute] = this.getDateInfo();
+        const selectedDate = new Date(year, month, day, hour, minute);
+        const diff = selectedDate - new Date(+new Date() + 1 * 6e4); // Добавим 1 минуту для устранения проблем со временем
+
+        const textError = this.newRemindItem.querySelector(".js-new-remind-item-error");
+
+        // Если это не прошедшее время
+        if (diff > 0) {
+            // Удалим текст ошибки
+            textError.classList.remove(this.classes.active);
+
+            // Соберём все необходимые данные
+            const id = this.newRemindItemInner.getAttribute("data-id");
+            const remindTitle = this.newRemindItemTitle.value;
+            const remindDate = this.getReceivedDate(month, day, year);
+            const remindTime = NewRemindItem.getReceivedTime(hour, minute);
+
+            // Отправляем на сервер изменённый Remind (пока что get, потом ПЕРЕДЕЛАТЬ НА POST)
+            axios({
+                method: this.newRemindItemInner.getAttribute("data-edit-method") || "get",
+                url: this.newRemindItemInner.getAttribute("data-edit-url")
+            })
+                .then((response) => {
+                    const receivedData = response.data;
+                    switch (receivedData.status) {
+                        case "GET_EDIT_REMIND_SUCCESS":
+                            // Обновим данные
+                            const remindItem = document.querySelector(`#${id}`);
+                            remindItem.setAttribute("data-date-and-time", `${year}, ${month}, ${day}, ${hour}, ${minute}`);
+                            remindItem.querySelector(".js-remind-title").innerHTML = remindTitle;
+                            remindItem.querySelector(".js-new-item-date-text").innerHTML = remindDate;
+                            remindItem.querySelector(".js-new-item-time-text").innerHTML = remindTime;
+
+                            // Закроем попап создания нового Remind
+                            this.newRemindItem.classList.remove(this.classes.visible);
+                            setTimeout(() => { // Задержка для плавного скрытия popup
+                                this.newRemindItem.classList.remove(this.classes.active);
+                            }, 150);
+
+                            // Обнулим все данные в попапе создания нового Remind
+                            this.clearNewRemindPopup();
+                            break;
+                        case "GET_EDIT_REMIND_FAIL":
+                            console.error(receivedData.data.errorMessage);
+                            break;
+                        default:
+                            console.error("Что-то пошло не так!");
+                            break;
+                    }
+                })
+                .catch((e) => {
+                    console.error(e);
+                });
+        } else {
+            textError.classList.add(this.classes.active);
+        }
     }
 }
 
