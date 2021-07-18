@@ -298,7 +298,6 @@ class NewRemindItem {
             // Обнулим все данные в попапе создания нового Remind
             this.clearNewRemindPopup();
         }, 150);
-
     }
 
     /**

@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { template } from 'underscore';
+import _debounce from 'lodash/debounce';
 
 class Reminders {
     constructor(el) {
@@ -131,10 +132,19 @@ class Reminders {
         // Действия с блоком Actions
         this.listenActionsEvents();
 
-        // Обновим все блоки Actions после обновления Remind items
-        this.remindersInner.addEventListener("DOMSubtreeModified", () => {
-            this.listenActionsEvents();
-        });
+        // Отслеживаем изменение количества элементов Reminds
+        let variants = this.remindersInner.innerHTML.split('class="reminders__item"').slice(1).length;
+        this.remindersInner.addEventListener("DOMSubtreeModified", _debounce(() => {
+            let newVariants = this.remindersInner.innerHTML.split('class="reminders__item"').slice(1).length;
+
+            // Если количество изменилось
+            if (variants !== newVariants) {
+                variants = newVariants;
+
+                // Обновим слушатели событий
+                this.listenActionsEvents();
+            }
+        }, 50));
     }
 
     /**
@@ -152,33 +162,46 @@ class Reminders {
 
             // Кнопка удаления Remind
             const removeRemindBtn = actionBlock.querySelector('.js-remind-remove');
-            
-            // Открытие/закрытие нужного блока Actions
-            actionBtn.addEventListener("click", () => {
-                this.toggleActionsVisibility(actionBlock);
-            });
-            
-            // Закрытие нужного Actions при клике вне блока
-            document.body.addEventListener("click", (e) => {
-                this.handleMilkClick(e, actionBtn, actionBlock);
-            });
 
-            // Удаление Remind
-            removeRemindBtn.addEventListener("click", () => {
-                // Получим ID выбранного Remind
-                const remindItemId = removeRemindBtn.closest(".reminders__item").getAttribute("id");
-                this.removeRemind(remindItemId);
-            });
+            // Слушатели событий для Actions
+            this.activateActionsEvents(actionBtn, actionBlock, removeRemindBtn, editRemindBtn);
+        });
+    }
 
-            // Открытие попапа изменения Remind
-            editRemindBtn.addEventListener("click", () => {
-                // Нужный Remind
-                const remindItem = removeRemindBtn.closest(".reminders__item");
+    /**
+     * Установка слушателей на блок Actions
+     * @param {object} actionBtn - кнопка для отображения блока Actions
+     * @param {object} actionBlock - блок Actions
+     * @param {object} removeRemindBtn - кнопка Remove
+     * @param {object} editRemindBtn - кнопка Edit
+     * @returns {void}
+     */
+    activateActionsEvents(actionBtn, actionBlock, removeRemindBtn, editRemindBtn) {
+        // Открытие/закрытие нужного блока Actions
+        actionBtn.addEventListener("click", () => {
+            this.toggleActionsVisibility(actionBlock);
+        });
 
-                // Добавим уже существующие данные
-                this.addRemindInfo(remindItem);
-            });
-        });   
+        // Закрытие нужного Actions при клике вне блока
+        document.body.addEventListener("click", (e) => {
+            this.handleMilkClick(e, actionBtn, actionBlock);
+        });
+
+        // Удаление Remind
+        removeRemindBtn.addEventListener("click", () => {
+            // Получим ID выбранного Remind
+            const remindItemId = removeRemindBtn.closest(".reminders__item").getAttribute("id");
+            this.removeRemind(remindItemId);
+        });
+
+        // Открытие попапа изменения Remind
+        editRemindBtn.addEventListener("click", () => {
+            // Нужный Remind
+            const remindItem = editRemindBtn.closest(".reminders__item");
+
+            // Добавим уже существующие данные
+            this.addRemindInfo(remindItem);
+        });
     }
 
     /**
@@ -243,6 +266,11 @@ class Reminders {
                     case "GET_REMOVE_REMIND_SUCCESS":
                         // Удалим выбранный Remind из списка
                         this.removeRemindItem(variants.slice(1), position);
+                        
+                        // Обновим слушатели событий
+                        _debounce(() => {
+                            this.listenActionsEvents();
+                        }, 50);
                         break;
                     case "GET_REMOVE_REMIND_FAIL":
                         console.error(receivedData.data.errorMessage);
