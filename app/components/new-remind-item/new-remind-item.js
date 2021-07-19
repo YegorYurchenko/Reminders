@@ -1,5 +1,5 @@
-import axios from 'axios';
 import { template } from 'underscore';
+import { ReminderSocket } from '../../common/scripts/app';
 
 class NewRemindItem {
     constructor(el) {
@@ -223,40 +223,55 @@ class NewRemindItem {
                 }
             }
 
-            let newRemindItemHtml = null;
+            const remindItemdata = {
+                "title": this.newRemindItemTitle.value,
+                "date": {
+                    "year": `${year}`,
+                    "month": `${month}`,
+                    "day": `${day}`
+                },
+                "time": {
+                    "hour": `${hour}`,
+                    "minute": `${minute}`
+                }
+            };
 
-            // Отправляем на сервер новый Remind (пока что get, потом ПЕРЕДЕЛАТЬ НА POST)
-            axios({
-                method: this.newRemindItemInner.getAttribute("data-method") || "get",
-                url: this.newRemindItemInner.getAttribute("data-url")
-            })
-                .then((response) => {
-                    const receivedData = response.data;
-                    switch (receivedData.status) {
-                        case "GET_NEW_REMINDER_ITEM_SUCCESS":
-                            // Сформируем новый Remind
-                            newRemindItemHtml = NewRemindItem.getReminderData(
-                                "remind_" + Math.floor(Math.random() * 1000 + 10), // ПОТОМ ИСПРАВИТЬ НА receivedData.data.id,
-                                `${year}, ${month}, ${day}, ${hour}, ${minute}`,
-                                this.newRemindItemTitle.value,
-                                this.getReceivedDate(month, day, year),
-                                NewRemindItem.getReceivedTime(hour, minute)
-                            );
-                            
-                            // Добавим новый элемент в список
-                            this.modifyRemindItemsList(variants.slice(1), position, newRemindItemHtml, allRemindItems);
-                            break;
-                        case "GET_NEW_REMINDER_ITEM_FAIL":
-                            console.error(receivedData.data.errorMessage);
-                            break;
-                        default:
-                            console.error("Что-то пошло не так!");
-                            break;
-                    }
-                })
-                .catch((e) => {
-                    console.error(e);
-                });
+            // Отправляем на сервер новый Remind
+            ReminderSocket.send(JSON.stringify({
+                'type': 'newRemind',
+                'newRemindData': remindItemdata
+            }));
+
+            const self = this;
+            let newRemindItemHtml = null;
+            ReminderSocket.onmessage = function (e) {
+                const receivedData = JSON.parse(e.data).data;
+                switch (receivedData.status) {
+                    case "success":
+                        // Сформируем новый Remind
+                        newRemindItemHtml = NewRemindItem.getReminderData(
+                            receivedData.data.id,
+                            `${year}, ${month}, ${day}, ${hour}, ${minute}`,
+                            self.newRemindItemTitle.value,
+                            self.getReceivedDate(month, day, year),
+                            NewRemindItem.getReceivedTime(hour, minute)
+                        );
+
+                        // Добавим новый элемент в список
+                        self.modifyRemindItemsList(variants.slice(1), position, newRemindItemHtml, allRemindItems);
+                        break;
+                    case "fail":
+                        console.error(receivedData.data.errorMessage);
+                        break;
+                    default:
+                        console.error("Что-то пошло не так!");
+                        break;
+                }
+            };
+
+            ReminderSocket.onerror = function (e) {
+                console.error(e);
+            };
         } else {
             textError.classList.add(this.classes.active);
         }
@@ -397,43 +412,59 @@ class NewRemindItem {
             const remindDate = this.getReceivedDate(month, day, year);
             const remindTime = NewRemindItem.getReceivedTime(hour, minute);
 
-            // Отправляем на сервер изменённый Remind (пока что get, потом ПЕРЕДЕЛАТЬ НА POST)
-            axios({
-                method: this.newRemindItemInner.getAttribute("data-edit-method") || "get",
-                url: this.newRemindItemInner.getAttribute("data-edit-url")
-            })
-                .then((response) => {
-                    const receivedData = response.data;
-                    switch (receivedData.status) {
-                        case "GET_EDIT_REMIND_SUCCESS":
-                            // Обновим данные
-                            const remindItem = document.querySelector(`#${id}`);
-                            remindItem.setAttribute("data-date-and-time", `${year}, ${month}, ${day}, ${hour}, ${minute}`);
-                            remindItem.querySelector(".js-remind-title").innerHTML = remindTitle;
-                            remindItem.querySelector(".js-new-item-date-text").innerHTML = remindDate;
-                            remindItem.querySelector(".js-new-item-time-text").innerHTML = remindTime;
+            const remindItemdata = {
+                id,
+                "title": this.newRemindItemTitle.value,
+                "date": {
+                    "year": `${year}`,
+                    "month": `${month}`,
+                    "day": `${day}`
+                },
+                "time": {
+                    "hour": `${hour}`,
+                    "minute": `${minute}`
+                }
+            };
 
-                            // Закроем попап создания нового Remind
-                            this.newRemindItem.classList.remove(this.classes.visible);
-                            setTimeout(() => { // Задержка для плавного скрытия popup
-                                this.newRemindItem.classList.remove(this.classes.active);
+            // Отправляем на сервер изменённый Remind
+            ReminderSocket.send(JSON.stringify({
+                'type': 'editRemind',
+                'remindNewData': remindItemdata
+            }));
 
-                                // Обнулим все данные в попапе создания нового Remind
-                                this.clearNewRemindPopup();
-                            }, 150);
+            const self = this;
+            ReminderSocket.onmessage = function (e) {
+                const receivedData = JSON.parse(e.data).data;
+                switch (receivedData.status) {
+                    case "success":
+                        // Обновим данные
+                        const remindItem = document.querySelector(`#${id}`);
+                        remindItem.setAttribute("data-date-and-time", `${year}, ${month}, ${day}, ${hour}, ${minute}`);
+                        remindItem.querySelector(".js-remind-title").innerHTML = remindTitle;
+                        remindItem.querySelector(".js-new-item-date-text").innerHTML = remindDate;
+                        remindItem.querySelector(".js-new-item-time-text").innerHTML = remindTime;
 
-                            break;
-                        case "GET_EDIT_REMIND_FAIL":
-                            console.error(receivedData.data.errorMessage);
-                            break;
-                        default:
-                            console.error("Что-то пошло не так!");
-                            break;
-                    }
-                })
-                .catch((e) => {
-                    console.error(e);
-                });
+                        // Закроем попап создания нового Remind
+                        self.newRemindItem.classList.remove(self.classes.visible);
+                        setTimeout(() => { // Задержка для плавного скрытия popup
+                            self.newRemindItem.classList.remove(self.classes.active);
+
+                            // Обнулим все данные в попапе создания нового Remind
+                            self.clearNewRemindPopup();
+                        }, 150);
+                        break;
+                    case "fail":
+                        console.error(receivedData.data.errorMessage);
+                        break;
+                    default:
+                        console.error("Что-то пошло не так!");
+                        break;
+                }
+            };
+
+            ReminderSocket.onerror = function (e) {
+                console.error(e);
+            };
         } else {
             textError.classList.add(this.classes.active);
         }

@@ -1,6 +1,6 @@
-import axios from 'axios';
 import { template } from 'underscore';
 import _debounce from 'lodash/debounce';
+import { ReminderSocket } from '../../common/scripts/app';
 
 class Reminders {
     constructor(el) {
@@ -39,36 +39,40 @@ class Reminders {
         this.remindersInner.innerHTML = "<span class='reminders__loading'>Loading...</span>";
 
         // Получаем все reminders
-        axios({
-            method: this.reminders.getAttribute("data-method") || "get",
-            url: this.reminders.getAttribute("data-url")
-        })
-            .then((response) => {
-                const receivedData = response.data;
-                switch (receivedData.status) {
-                    case "GET_REMINDERS_LIST_SUCCESS":
-                        setTimeout(() => {
-                            this.remindersInner.innerHTML = this.getReminderData(receivedData.data);
-                            this.setListeners();
-                        }, 800);
-                        break;
-                    case "GET_REMINDERS_LIST_FAIL":
-                        setTimeout(() => {
-                            this.remindersInner.innerHTML = '<span class="reminders__error">;-( server error, please try again in a moment...</span>';
-                        }, 800);
-                        console.error(receivedData.data.errorMessage);
-                        break;
-                    default:
-                        setTimeout(() => {
-                            this.remindersInner.innerHTML = '<span class="reminders__error">;-( server error, please try again in a moment...</span>';
-                        }, 800);
-                        console.error("Что-то пошло не так!");
-                        break;
-                }
-            })
-            .catch((e) => {
-                console.error(e);
-            });
+        ReminderSocket.onopen = function () {
+            ReminderSocket.send(JSON.stringify({
+                'type': 'initialization'
+            }));
+        };
+
+        const self = this;
+        ReminderSocket.onmessage = function (e) {
+            const receivedData = JSON.parse(e.data).data;
+            switch (receivedData.status) {
+                case "success":
+                    setTimeout(() => {
+                        self.remindersInner.innerHTML = self.getReminderData(receivedData.data);
+                        self.setListeners();
+                    }, 800);
+                    break;
+                case "fail":
+                    setTimeout(() => {
+                        self.remindersInner.innerHTML = '<span class="reminders__error">;-( server error, please try again in a moment...</span>';
+                    }, 800);
+                    console.error(receivedData.data.errorMessage);
+                    break;
+                default:
+                    setTimeout(() => {
+                        self.remindersInner.innerHTML = '<span class="reminders__error">;-( server error, please try again in a moment...</span>';
+                    }, 800);
+                    console.error("Что-то пошло не так!");
+                    break;
+            }
+        };
+
+        ReminderSocket.onerror = function (e) {
+            console.error(e);
+        };
     }
 
     /**
@@ -145,6 +149,67 @@ class Reminders {
                 this.listenActionsEvents();
             }
         }, 50));
+
+        // Посчитаем, сколько секунд осталось до начала следующей минуты
+        const now = new Date();
+        const currentTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), now.getMinutes() + 1, 1)
+        const timer = currentTime - new Date();
+
+        setTimeout(() => {
+            this.checkReminderTimer();
+
+            setInterval(() => {
+                this.checkReminderTimer();
+            }, 60000)
+        }, timer);
+    }
+
+    /**
+     * Прверка изменений раз в 5 минут
+     * @returns {void}
+     */
+    checkReminderTimer() {
+        if (new Date().getMinutes() % 5 === 0) {
+            ReminderSocket.send(JSON.stringify({
+                'type': 'checkReminderTimer'
+            }));
+
+            const self = this;
+            ReminderSocket.onmessage = function (e) {
+                const receivedData = JSON.parse(e.data).data;
+                switch (receivedData.status) {
+                    case "success":
+                        // Все Reminds
+                        let variants = self.remindersInner.innerHTML.split('class="reminders__item"');
+
+                        const RegExp = /remind_\d{1,}/;
+                        let position = variants.length - 1;
+
+                        // Найдём, какой Remind нужно удалить (ищем по id)
+                        for (let i = 1; i < variants.length; i++) {
+                            let remindId = RegExp.exec(variants[i])[0];
+
+                            if (remindId === receivedData.data.id) {
+                                position = i - 1;
+                                break;
+                            }
+                        }
+
+                        self.removeRemindItem(variants.slice(1), position);
+                        break;
+                    case "fail":
+                        console.error(receivedData.data.errorMessage);
+                        break;
+                    default:
+                        console.error("Что-то пошло не так!");
+                        break;
+                }
+            };
+
+            ReminderSocket.onerror = function (e) {
+                console.error(e);
+            };
+        }
     }
 
     /**
@@ -255,34 +320,31 @@ class Reminders {
             }
         }
 
-        // Отправляем на сервер id Remind, который нужно удалить (пока что get, потом ПЕРЕДЕЛАТЬ НА POST)
-        axios({
-            method: this.remindersInner.getAttribute("data-remove-method") || "get",
-            url: this.remindersInner.getAttribute("data-remove-url")
-        })
-            .then((response) => {
-                const receivedData = response.data;
-                switch (receivedData.status) {
-                    case "GET_REMOVE_REMIND_SUCCESS":
-                        // Удалим выбранный Remind из списка
-                        this.removeRemindItem(variants.slice(1), position);
-                        
-                        // Обновим слушатели событий
-                        _debounce(() => {
-                            this.listenActionsEvents();
-                        }, 50);
-                        break;
-                    case "GET_REMOVE_REMIND_FAIL":
-                        console.error(receivedData.data.errorMessage);
-                        break;
-                    default:
-                        console.error("Что-то пошло не так!");
-                        break;
-                }
-            })
-            .catch((e) => {
-                console.error(e);
-            });
+        // Отправляем на сервер id Remind, который нужно удалить
+        ReminderSocket.send(JSON.stringify({
+            'type': 'removeRemind',
+            'remindId': chosenRemindId
+        }));
+
+        const self = this;
+        ReminderSocket.onmessage = function (e) {
+            const receivedData = JSON.parse(e.data).data;
+            switch (receivedData.status) {
+                case "success":
+                    self.removeRemindItem(variants.slice(1), position);
+                    break;
+                case "fail":
+                    console.error(receivedData.data.errorMessage);
+                    break;
+                default:
+                    console.error("Что-то пошло не так!");
+                    break;
+            }
+        };
+
+        ReminderSocket.onerror = function (e) {
+            console.error(e);
+        };
     }
 
     /**

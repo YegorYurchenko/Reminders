@@ -1,6 +1,12 @@
 // import styles
 import '../styles/app.scss';
 
+export const ReminderSocket = new WebSocket(
+    'ws://'
+    + window.location.host
+    + '/ws/'
+);
+
 // components
 import '../../components/header/header.js';
 import '../../components/reminders/reminders.js';
