@@ -133,7 +133,13 @@ class SelectTime {
      * @returns {object}
      */
     getCurrentTime() {
-        const date = new Date(+new Date() + 10 * 6e4);
+        let date = new Date(+new Date() + 5 * 6e4);
+        
+        const minutes = date.getMinutes() % 5;
+        if (minutes !== 0) {
+            date = new Date(+new Date() + (10 - minutes) * 6e4);
+        }
+        
         const currentHour = date.getHours();
         const currentMinute = date.getMinutes();
 
