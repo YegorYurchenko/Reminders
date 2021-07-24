@@ -8,7 +8,7 @@
 
 Задание - https://github.com/A-Lena375/_Test_
 
-Используемые технологии: JavaScript, HTML, SCSS, Underscore (template), Axios, Webpack
+Используемые технологии: JavaScript, HTML, SCSS, Underscore (template), Axios, Webpack, WebSocket
 
 При работе со сборкой использовался [Node.js](https://nodejs.org/en/) версии [12.16.1](https://nodejs.org/download/release/v12.16.1/)
 
