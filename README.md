@@ -12,6 +12,10 @@
 
 При работе со сборкой использовался [Node.js](https://nodejs.org/en/) версии [12.16.1](https://nodejs.org/download/release/v12.16.1/)
 
+Ветка `master` - актуальная для локального запуска через `npm start`
+
+Ветка `task-backend` - доработка frontend'a через WebSocket, создана для репозитория `Reminders-backend` (не будет работать через npm start)
+
 ## Установка
 
 1. Клонируйте репозиторий: `git clone https://github.com/YegorYurchenko/Reminders.git`
