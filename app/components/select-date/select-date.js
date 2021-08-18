@@ -56,6 +56,18 @@ class SelectDate {
     init() {
         this.fillDays();
         this.daysList = this.selectDateBlock.querySelectorAll(".js-select-day-item");
+
+        // Установим текущий месяц
+        const month = String(new Date().getMonth()).padStart(2, "0");
+        this.selectMonth.setAttribute("data-month", month);
+        this.selectMonth.innerHTML = this.months[month];
+
+        // Установим текущий год
+        const year = String(new Date().getFullYear());
+        this.selectYear.setAttribute("data-year", year);
+        this.selectYear.innerHTML = year;
+
+        // Проверка активности кнопок
         this.correctButtons();
     }
 
